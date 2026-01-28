@@ -3,207 +3,154 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
-import BlobShape from "./ui/BlobShape";
 
 export default function MessageSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  
   const { scrollYProgress } = useScroll({
-    target: containerRef,
+    target: sectionRef,
     offset: ["start end", "end start"],
   });
 
-  const y1 = useTransform(scrollYProgress, [0, 1], ["0%", "-10%"]);
-  const y2 = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  // Parallax for background text
+  const textX = useTransform(scrollYProgress, [0, 1], ["0%", "-20%"]);
 
   return (
     <section
-      ref={containerRef}
-      className="relative min-h-screen w-full overflow-hidden bg-dark-green py-24"
+      ref={sectionRef}
+      className="relative min-h-screen w-full overflow-hidden bg-[#2A2F23]"
     >
-      {/* Background Blob Shapes */}
-      <BlobShape
-        className="top-[5%] left-[10%] opacity-20"
-        color="rgba(212, 245, 30, 0.1)"
-        size={500}
-        delay={0.2}
-      />
-      <BlobShape
-        className="bottom-[10%] right-[5%] opacity-20"
-        color="rgba(212, 245, 30, 0.08)"
-        size={400}
-        delay={0.4}
-      />
+      {/* Background color matches Hero's dark wrapper */}
+      {/* No lines - uses global fixed lines from Hero */}
 
-      {/* MESSAGE FROM LANDO Label */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.6 }}
-        className="flex flex-col items-center justify-center gap-2 mb-12"
+      {/* Large Background Scrolling Text */}
+      <motion.div 
+        className="absolute inset-0 flex items-center overflow-hidden pointer-events-none"
+        style={{ x: textX }}
       >
-        {/* LN Logo */}
-        <div className="w-8 h-8 flex items-center justify-center">
-          <svg viewBox="0 0 40 40" className="w-full h-full">
-            <text
-              x="50%"
-              y="50%"
-              dominantBaseline="middle"
-              textAnchor="middle"
-              className="fill-cream text-lg font-bold"
-            >
-              LN
-            </text>
-          </svg>
+        <div className="whitespace-nowrap">
+          <span className="text-[15vw] font-display font-bold text-lime/20 tracking-tight">
+            HOME WEEKEND I WAS AT HOME REMEMBER HOME WEEKEND
+          </span>
         </div>
-        <span className="text-[10px] tracking-[0.3em] text-cream/60 uppercase">
-          Message from Lando
-        </span>
+      </motion.div>
+      <motion.div 
+        className="absolute inset-0 flex items-center overflow-hidden pointer-events-none mt-[15vw]"
+        style={{ x: textX }}
+      >
+        <div className="whitespace-nowrap">
+          <span className="text-[15vw] font-display font-bold text-cream/10 tracking-tight">
+            WEEKEND I REMEMBER IT AT HOME MEMBER WEEKEND I
+          </span>
+        </div>
       </motion.div>
 
-      {/* Main Content - Large Typography with Portrait */}
-      <div className="relative flex flex-col items-center justify-center min-h-[60vh]">
-        {/* Row 1 - WE DID / [Image] / HOME */}
+      {/* Main Content */}
+      <div className="relative z-20 flex flex-col items-center justify-center min-h-screen px-6 py-24">
+        {/* Logo and Title */}
         <motion.div
-          style={{ y: y1 }}
-          className="flex items-center justify-center gap-4 md:gap-8 w-full"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="flex flex-col items-center mb-8"
         >
-          <motion.span
-            initial={{ opacity: 0, x: -100 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-[clamp(3rem,12vw,10rem)] font-display font-light text-lime leading-none"
-          >
-            WE DID
-          </motion.span>
-
-          {/* Center Portrait with Signature */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="relative w-32 h-40 md:w-48 md:h-60 flex-shrink-0"
-          >
-            {/* Portrait Image */}
-            <div className="relative w-full h-full overflow-hidden rounded-lg">
-              <Image
-                src="/assets/lando-portrait-bw.jpg"
-                alt="Lando Norris"
-                fill
-                className="object-cover grayscale"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                }}
-              />
-              {/* Fallback */}
-              <div className="absolute inset-0 bg-gradient-to-b from-cream/20 to-cream/40" />
-            </div>
-
-            {/* Signature Overlay */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.8 }}
-              className="absolute inset-0 flex items-center justify-center"
-            >
-              <svg
-                viewBox="0 0 200 150"
-                className="w-full h-full stroke-lime fill-none"
+          {/* SD Logo */}
+          <div className="w-10 h-10 mb-3 flex items-center justify-center">
+            <svg viewBox="0 0 40 40" className="w-full h-full">
+              <path
+                d="M10 8 L20 8 L20 18 L30 18 L30 32 L20 32 L20 22 L10 22 Z"
+                fill="none"
+                stroke="#D4F51E"
                 strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                {/* Stylized signature - L shape with flourish */}
-                <motion.path
-                  d="M40 30 L40 100 L80 100 Q100 100, 110 80 Q120 60, 140 70 Q160 80, 170 60"
-                  initial={{ pathLength: 0 }}
-                  whileInView={{ pathLength: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 1.5, delay: 1, ease: "easeInOut" }}
-                />
-                <motion.path
-                  d="M90 50 Q100 30, 130 40 Q150 50, 160 30"
-                  initial={{ pathLength: 0 }}
-                  whileInView={{ pathLength: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 1, delay: 1.5, ease: "easeInOut" }}
-                />
-              </svg>
-            </motion.div>
-          </motion.div>
-
-          <motion.span
-            initial={{ opacity: 0, x: 100 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-[clamp(3rem,12vw,10rem)] font-display font-light text-cream/30 leading-none"
-          >
-            HOME
-          </motion.span>
+              />
+            </svg>
+          </div>
+          <span className="text-[10px] tracking-[0.3em] uppercase text-cream/60">
+            Message from Smrity
+          </span>
         </motion.div>
 
-        {/* Row 2 - AND I WILL / REMEMBER */}
+        {/* Portrait with Signature */}
         <motion.div
-          style={{ y: y2 }}
-          className="flex items-center justify-center gap-4 md:gap-8 w-full -mt-4"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="relative w-full max-w-md aspect-[3/4]"
         >
-          <motion.span
-            initial={{ opacity: 0, x: -100 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-[clamp(3rem,12vw,10rem)] font-display font-light text-lime leading-none"
-          >
-            AND I WILL
-          </motion.span>
+          {/* Portrait Image */}
+          <div className="absolute inset-0 overflow-hidden">
+            <Image
+              src="/assets/portrait-bw.jpg"
+              alt="Portrait"
+              fill
+              className="object-cover object-top grayscale"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = "none";
+              }}
+            />
+            {/* Fallback */}
+            <div className="absolute inset-0 bg-gradient-to-b from-dark-text/40 via-dark-text/60 to-dark-text/80 flex items-start justify-center pt-[10%]">
+              <div className="w-[75%] aspect-[3/4] bg-gradient-to-t from-dark-text/50 via-dark-text/30 to-transparent rounded-t-[45%]" />
+            </div>
+          </div>
 
-          <motion.span
-            initial={{ opacity: 0, x: 100 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-[clamp(3rem,12vw,10rem)] font-display font-light text-cream/30 leading-none"
+          {/* Signature SVG Overlay */}
+          <motion.svg
+            viewBox="0 0 400 500"
+            className="absolute inset-0 w-full h-full"
+            fill="none"
           >
-            REMEMBER
-          </motion.span>
+            {/* Signature Path - Stylized "SD" autograph */}
+            <motion.path
+              d="M80 280 
+                 Q 100 240, 140 260 
+                 Q 180 280, 160 320 
+                 Q 140 360, 100 340
+                 Q 60 320, 80 280
+                 M 100 340 L 180 420
+                 M 160 320 Q 200 280, 240 300
+                 Q 280 320, 260 360
+                 Q 240 400, 200 380
+                 L 320 280
+                 M 320 280 Q 380 240, 360 320
+                 Q 340 400, 280 420"
+              stroke="#D4F51E"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              initial={{ pathLength: 0 }}
+              whileInView={{ pathLength: 1 }}
+              transition={{ duration: 2, delay: 0.5, ease: "easeOut" }}
+              viewport={{ once: true }}
+            />
+            {/* Additional flourish lines */}
+            <motion.path
+              d="M60 360 Q 120 380, 180 350 Q 240 320, 300 360 Q 360 400, 340 440"
+              stroke="#D4F51E"
+              strokeWidth="3"
+              strokeLinecap="round"
+              fill="none"
+              initial={{ pathLength: 0 }}
+              whileInView={{ pathLength: 1 }}
+              transition={{ duration: 1.5, delay: 1.5, ease: "easeOut" }}
+              viewport={{ once: true }}
+            />
+            <motion.path
+              d="M100 400 L 320 400"
+              stroke="#D4F51E"
+              strokeWidth="2"
+              strokeLinecap="round"
+              initial={{ pathLength: 0 }}
+              whileInView={{ pathLength: 1 }}
+              transition={{ duration: 0.8, delay: 2.2, ease: "easeOut" }}
+              viewport={{ once: true }}
+            />
+          </motion.svg>
         </motion.div>
       </div>
-
-      {/* Tagline */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: 0.6 }}
-        className="text-center text-xs tracking-[0.3em] text-cream/40 uppercase mt-16"
-      >
-        McLaren F1 Since 2019
-      </motion.p>
-
-      {/* Quote Section */}
-      <motion.div
-        style={{ opacity }}
-        className="max-w-3xl mx-auto px-6 mt-24 text-center"
-      >
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-xl md:text-2xl text-cream/80 leading-relaxed"
-        >
-          <span className="font-bold text-lime">Redefining</span> limits, fighting for{" "}
-          <span className="font-bold text-lime">wins</span>, bringing it all in all ways.
-          Defining a <span className="font-bold text-lime">legacy</span> in Formula 1 on
-          and off the track.
-        </motion.p>
-      </motion.div>
     </section>
   );
 }

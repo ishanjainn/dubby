@@ -12,16 +12,22 @@ export default function Logo({ className = "", variant = "dark" }: LogoProps) {
   
   return (
     <motion.div 
-      className={`flex flex-col leading-none select-none ${className}`}
+      className={`flex flex-col leading-[0.95] select-none ${className}`}
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <span className={`text-[11px] tracking-[0.35em] font-light uppercase ${textColor}`}>
-        Lando
+      <span 
+        className={`text-[24px] md:text-[32px] tracking-[0.08em] uppercase ${textColor}`}
+        style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontWeight: 300 }}
+      >
+        Max
       </span>
-      <span className={`text-[11px] tracking-[0.35em] font-bold uppercase ${textColor}`}>
-        Norris
+      <span 
+        className={`text-[24px] md:text-[32px] tracking-[0.08em] uppercase ${textColor}`}
+        style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontWeight: 900 }}
+      >
+        Verstappen
       </span>
     </motion.div>
   );

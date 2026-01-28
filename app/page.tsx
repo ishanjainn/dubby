@@ -1,5 +1,6 @@
 import Hero from "@/components/Hero";
-import MessageSection from "@/components/MessageSection";
+import BackgroundLines from "@/components/BackgroundLines";
+import LegacySection from "@/components/LegacySection";
 import PhotoGallery from "@/components/PhotoGallery";
 import OnOffTrack from "@/components/OnOffTrack";
 import HelmetsSection from "@/components/HelmetsSection";
@@ -11,8 +12,9 @@ import Footer from "@/components/Footer";
 export default function Home() {
   return (
     <main>
+      <BackgroundLines />
       <Hero />
-      <MessageSection />
+      <LegacySection />
       <PhotoGallery />
       <OnOffTrack />
       <HelmetsSection />

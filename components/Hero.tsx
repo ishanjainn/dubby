@@ -1,287 +1,256 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import NationalRaceWidget from "./ui/NationalRaceWidget";
 
+interface BrushMark {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  rotation: number;
+}
+
 export default function Hero() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const imageContainerRef = useRef<HTMLDivElement>(null);
-  
-  // Mouse tracking for reveal effect
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+  const [brushMarks, setBrushMarks] = useState<BrushMark[]>([]);
+  const markIdRef = useRef(0);
 
   const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"],
+    target: wrapperRef,
+    offset: ["start start", "end end"],
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  // Transform values for scroll-based shrinking effect
+  // Shrinks in first 40% of scroll, then stays at final size (smaller to show more text)
+  const scale = useTransform(scrollYProgress, [0, 0.4, 1], [1, 0.4, 0.4]);
+  const borderRadius = useTransform(scrollYProgress, [0, 0.4, 1], [0, 16, 16]);
+  const widgetOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
+  // Add padding around hero as it shrinks to reveal section behind
+  const padding = useTransform(scrollYProgress, [0, 0.4, 1], [0, 80, 80]);
+  // Signature draw progress (draws during 40%-80% of scroll)
+  const signatureProgress = useTransform(scrollYProgress, [0.4, 0.8], [0, 1]);
+  // Signature only visible when drawing starts
+  const signatureOpacity = useTransform(scrollYProgress, [0, 0.39, 0.4], [0, 0, 1]);
+  // Hero background transitions from cream to gray (like Lando's message section card)
+  const heroBackground = useTransform(
+    scrollYProgress,
+    [0, 0.3, 0.4],
+    ["#F5F5F0", "#5A5F54", "#4A4F44"]
+  );
+  // Flowing lines on cream section fade out
+  // Marquee text opacity - visible immediately as dark edges appear
+  const marqueeOpacity = useTransform(scrollYProgress, [0, 0.05], [0, 1]);
+  // Brush effect disabled when hero shrinks
+  const brushEnabled = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
-  // Handle mouse move for reveal effect
+  // Handle mouse move to create brush trail that reveals image below
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!imageContainerRef.current) return;
+    // Disable brush when hero is shrunk
+    if (!imageRef.current || brushEnabled.get() < 0.5) return;
     
-    const rect = imageContainerRef.current.getBoundingClientRect();
+    const rect = imageRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    setMousePos({ x, y });
-  }, []);
-
-  const handleMouseEnter = useCallback(() => {
-    setIsHovering(true);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    setIsHovering(false);
-  }, []);
+    // Create a new brush mark - 3x bigger size for reveal effect
+    const newMark: BrushMark = {
+      id: markIdRef.current++,
+      x,
+      y,
+      size: 240 + Math.random() * 180,
+      rotation: Math.random() * 360,
+    };
+    
+    setBrushMarks(prev => [...prev, newMark]);
+    
+    // Remove the mark after a short delay
+    setTimeout(() => {
+      setBrushMarks(prev => prev.filter(mark => mark.id !== newMark.id));
+    }, 600);
+  }, [brushEnabled]);
 
   return (
-    <section
-      ref={containerRef}
-      className="relative h-screen w-full overflow-hidden bg-cream"
-    >
-      {/* Background Flowing Lines */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Line 1 - Large curve on right */}
-        <motion.svg
-          initial={{ opacity: 0, pathLength: 0 }}
-          animate={{ opacity: 1, pathLength: 1 }}
-          transition={{ duration: 2, delay: 0.3 }}
-          className="absolute top-0 right-0 w-[60%] h-full"
-          viewBox="0 0 600 900"
-          fill="none"
-          preserveAspectRatio="none"
-        >
-          <motion.path
-            d="M600 0 C 400 150, 500 300, 450 450 C 400 600, 550 750, 600 900"
-            stroke="rgba(42, 47, 35, 0.06)"
-            strokeWidth="1"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 3, ease: "easeInOut" }}
-          />
-          <motion.path
-            d="M550 0 C 350 200, 450 350, 400 500 C 350 650, 500 800, 550 900"
-            stroke="rgba(42, 47, 35, 0.04)"
-            strokeWidth="1"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 3, delay: 0.2, ease: "easeInOut" }}
-          />
-        </motion.svg>
+    <div ref={wrapperRef} className="relative h-[180vh] bg-[#2A2F23]">
+      {/* Background lines are now global - rendered in BackgroundLines component */}
 
-        {/* Line 2 - Curve on left */}
-        <motion.svg
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 2, delay: 0.5 }}
-          className="absolute top-[10%] left-0 w-[50%] h-[80%]"
-          viewBox="0 0 500 800"
-          fill="none"
-          preserveAspectRatio="none"
-        >
-          <motion.path
-            d="M0 100 C 150 150, 200 300, 150 450 C 100 600, 200 700, 100 800"
-            stroke="rgba(42, 47, 35, 0.05)"
-            strokeWidth="1"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 3, delay: 0.4, ease: "easeInOut" }}
-          />
-          <motion.path
-            d="M0 200 C 100 250, 150 350, 100 500 C 50 650, 150 750, 50 850"
-            stroke="rgba(42, 47, 35, 0.03)"
-            strokeWidth="1"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 3, delay: 0.6, ease: "easeInOut" }}
-          />
-        </motion.svg>
-
-        {/* Line 3 - Center curves around portrait */}
-        <motion.svg
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 2, delay: 0.7 }}
-          className="absolute top-[5%] left-[20%] w-[60%] h-[90%]"
-          viewBox="0 0 600 900"
-          fill="none"
-          preserveAspectRatio="none"
-        >
-          <motion.path
-            d="M100 0 C 50 200, 150 400, 100 500 C 50 600, 150 700, 200 900"
-            stroke="rgba(42, 47, 35, 0.04)"
-            strokeWidth="1"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 3.5, delay: 0.8, ease: "easeInOut" }}
-          />
-          <motion.path
-            d="M500 0 C 550 200, 450 400, 500 500 C 550 600, 450 700, 400 900"
-            stroke="rgba(42, 47, 35, 0.04)"
-            strokeWidth="1"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 3.5, delay: 1, ease: "easeInOut" }}
-          />
-        </motion.svg>
-
-        {/* Subtle lime accent line */}
-        <motion.svg
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 2, delay: 1 }}
-          className="absolute top-[20%] left-[30%] w-[40%] h-[60%]"
-          viewBox="0 0 400 600"
-          fill="none"
-          preserveAspectRatio="none"
-        >
-          <motion.path
-            d="M50 0 C 0 150, 100 300, 50 400 C 0 500, 100 550, 80 600"
-            stroke="rgba(212, 245, 30, 0.08)"
-            strokeWidth="1"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 4, delay: 1.2, ease: "easeInOut" }}
-          />
-        </motion.svg>
-      </div>
-
-      {/* Main Content Container */}
       <motion.div
-        style={{ y, opacity }}
-        className="relative z-10 flex flex-col items-center h-full px-6 pt-16"
+        className="sticky top-0 h-screen w-full flex items-center justify-center z-10"
+        style={{ padding }}
       >
-        {/* LN Logo with wireframe helmet */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative mb-2"
+        {/* "Message from Smrity" title - centered above hero card */}
+        <motion.div 
+          className="absolute top-[20%] left-0 right-0 z-[2] flex items-center justify-center pointer-events-none"
+          style={{ opacity: marqueeOpacity }}
         >
-          {/* Wireframe helmet above logo */}
-          <svg
-            viewBox="0 0 120 50"
-            className="w-28 h-12 stroke-dark-text/15 fill-none absolute -top-10 left-1/2 -translate-x-1/2"
-          >
-            <ellipse cx="60" cy="42" rx="45" ry="12" strokeWidth="0.5" />
-            <path d="M18 38 Q 60 -5, 102 38" strokeWidth="0.5" />
-            <path d="M22 39 Q 60 5, 98 39" strokeWidth="0.5" />
-            <path d="M26 40 Q 60 12, 94 40" strokeWidth="0.5" />
-            {[35, 47, 60, 73, 85].map((x) => (
-              <line key={x} x1={x} y1="8" x2={x} y2="42" strokeWidth="0.5" />
-            ))}
-          </svg>
-          
-          {/* LN Logo */}
-          <svg viewBox="0 0 28 28" className="w-6 h-6 text-dark-text">
-            <path
-              d="M4 4 L4 20 L10 20"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M14 20 L14 8 L20 20 L20 4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <span className="text-[10px] tracking-[0.25em] text-cream/70 uppercase">Message from Smrity</span>
         </motion.div>
 
-        {/* Portrait Container with Hover Reveal Effect - Takes up most of the screen */}
-        <motion.div
-          ref={imageContainerRef}
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2, delay: 0.3 }}
-          className="relative w-full max-w-2xl lg:max-w-3xl flex-1 cursor-pointer"
-          style={{ maxHeight: 'calc(100vh - 180px)' }}
-          onMouseMove={handleMouseMove}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+        {/* Scrolling Marquee Text - on dark wrapper, behind hero card */}
+        <motion.div 
+          className="absolute inset-0 z-[1] overflow-hidden pointer-events-none"
+          style={{ opacity: marqueeOpacity }}
         >
-          {/* Bottom Layer - Reveal Image (One Piece character / Helmet with visor) */}
-          <div className="absolute inset-0 overflow-hidden">
-            <Image
-              src="/assets/portrait-reveal.jpg"
-              alt="Reveal image"
-              fill
-              className="object-cover object-top"
-              priority
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = "none";
-              }}
-            />
-            {/* Fallback - cool visor/anime style */}
-            <div className="absolute inset-0 bg-gradient-to-b from-cream via-dark-text/5 to-dark-text/20 flex items-start justify-center pt-[15%]">
-              <div className="w-[70%] aspect-[3/4] relative">
-                {/* Face silhouette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-dark-text/30 via-dark-text/10 to-transparent rounded-t-[45%]" />
-                {/* Visor/sunglasses effect */}
-                <div className="absolute top-[28%] left-[8%] right-[8%] h-[12%] bg-gradient-to-r from-lime/50 via-dark-text/70 to-lime/50 rounded-full transform -skew-y-1" 
-                  style={{ boxShadow: '0 0 30px rgba(212, 245, 30, 0.3)' }}
-                />
-              </div>
-            </div>
+          {/* Top row - scrolling left - lime yellow */}
+          <div className="absolute top-[36%] left-0 w-[200%] flex whitespace-nowrap animate-marquee-left">
+            <span className="text-[6vw] font-black text-[#C4D468] mx-6 italic tracking-tight">WE DID IT AT HOME</span>
+            <span className="text-[6vw] font-black text-[#C4D468] mx-6 italic tracking-tight">DREAMS COME TRUE</span>
+            <span className="text-[6vw] font-black text-[#C4D468] mx-6 italic tracking-tight">WE DID IT AT HOME</span>
+            <span className="text-[6vw] font-black text-[#C4D468] mx-6 italic tracking-tight">DREAMS COME TRUE</span>
           </div>
+          {/* Bottom row - scrolling right - cream/off-white */}
+          <div className="absolute top-[52%] left-0 w-[200%] flex whitespace-nowrap animate-marquee-right">
+            <span className="text-[6vw] font-black text-[#E8E4D9]/80 mx-6 italic tracking-tight">BRITISH GP WEEKEND</span>
+            <span className="text-[6vw] font-black text-[#E8E4D9]/80 mx-6 italic tracking-tight">I WILL REMEMBER FOREVER</span>
+            <span className="text-[6vw] font-black text-[#E8E4D9]/80 mx-6 italic tracking-tight">BRITISH GP WEEKEND</span>
+            <span className="text-[6vw] font-black text-[#E8E4D9]/80 mx-6 italic tracking-tight">I WILL REMEMBER FOREVER</span>
+          </div>
+        </motion.div>
 
-          {/* Top Layer - Main Portrait with mask */}
-          <div 
-            className="absolute inset-0 overflow-hidden transition-all duration-75"
+        <motion.section
+          className="relative w-full h-full overflow-hidden z-[5]"
+          style={{ scale, borderRadius, backgroundColor: heroBackground }}
+        >
+      {/* Background lines handled by global BackgroundLines component */}
+
+      {/* Hero Portrait Image - Bottom aligned with reveal effect */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 0.2 }}
+        className="absolute inset-0 z-10 flex items-end justify-center"
+      >
+        <div 
+          ref={imageRef}
+          className="relative w-[85%] h-[85%] max-w-4xl cursor-pointer"
+          onMouseMove={handleMouseMove}
+        >
+          {/* Main Portrait - Always visible on top, becomes grayscale as shrinks */}
+          <motion.div 
+            className="absolute inset-0 z-10"
             style={{
-              maskImage: isHovering 
-                ? `radial-gradient(circle 100px at ${mousePos.x}px ${mousePos.y}px, transparent 0%, transparent 50%, black 80%, black 100%)`
-                : 'none',
-              WebkitMaskImage: isHovering 
-                ? `radial-gradient(circle 100px at ${mousePos.x}px ${mousePos.y}px, transparent 0%, transparent 50%, black 80%, black 100%)`
-                : 'none',
+              filter: useTransform(
+                scrollYProgress,
+                [0, 0.4],
+                ["grayscale(0) brightness(1)", "grayscale(1) brightness(0.7)"]
+              ),
             }}
           >
             <Image
-              src="/assets/portrait.jpg"
-              alt="Portrait"
+              src="/hero.png"
+              alt="Smrity Dubey"
               fill
-              className="object-cover object-top"
+              className="object-contain object-bottom"
               priority
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = "none";
-              }}
             />
-            {/* Fallback portrait */}
-            <div className="absolute inset-0 bg-gradient-to-b from-cream via-cream/95 to-dark-text/10 flex items-start justify-center pt-[15%]">
-              <div className="w-[70%] aspect-[3/4] bg-gradient-to-t from-dark-text/20 via-dark-text/5 to-transparent rounded-t-[45%]" />
-            </div>
-          </div>
+          </motion.div>
 
-          {/* Gradient fade at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-cream via-cream/80 to-transparent pointer-events-none" />
-        </motion.div>
+          {/* Brush Reveal Marks - Show the reveal image only where brush strokes are */}
+          <AnimatePresence>
+            {brushMarks.map((mark) => (
+              <motion.div
+                key={mark.id}
+                initial={{ opacity: 1, scale: 0.8 }}
+                animate={{ opacity: 0, scale: 1.3 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="absolute pointer-events-none z-20 overflow-hidden"
+                style={{
+                  left: mark.x - mark.size / 2,
+                  top: mark.y - mark.size / 2,
+                  width: mark.size,
+                  height: mark.size,
+                  borderRadius: '50%',
+                }}
+              >
+                {/* Reveal image clipped to brush shape */}
+                <div 
+                  className="absolute"
+                  style={{
+                    width: imageRef.current?.offsetWidth || 1000,
+                    height: imageRef.current?.offsetHeight || 1000,
+                    left: -(mark.x - mark.size / 2),
+                    top: -(mark.y - mark.size / 2),
+                  }}
+                >
+                  <Image
+                    src="/hero-reveal.png"
+                    alt="Reveal"
+                    fill
+                    className="object-contain object-bottom"
+                  />
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
       </motion.div>
 
-      {/* National Race Widget - Bottom Left */}
-      <div className="absolute bottom-6 left-6 z-20">
-        <NationalRaceWidget />
-      </div>
-    </section>
+        {/* National Race Widget - Bottom Left */}
+        <motion.div 
+          className="absolute bottom-6 left-6 z-20"
+          style={{ opacity: widgetOpacity }}
+        >
+          <NationalRaceWidget />
+        </motion.div>
+        </motion.section>
+
+        {/* Animated Signature - Positioned over hero but extends beyond */}
+        <motion.svg
+          className="absolute z-40 pointer-events-none"
+          style={{ 
+            width: '120vw',
+            height: '100vh',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            opacity: signatureOpacity
+          }}
+          viewBox="0 0 1200 800"
+          fill="none"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          {/* First diagonal stroke - top right sweeping down */}
+          <motion.path
+            d="M900 80 Q 700 200, 500 450 Q 350 600, 200 720"
+            stroke="#D4F51E"
+            strokeWidth="8"
+            strokeLinecap="round"
+            fill="none"
+            style={{ pathLength: signatureProgress }}
+          />
+          {/* Large looping curve around center */}
+          <motion.path
+            d="M800 150 Q 1000 280, 950 450 Q 900 620, 700 550 Q 500 480, 550 350 Q 600 220, 800 280"
+            stroke="#D4F51E"
+            strokeWidth="8"
+            strokeLinecap="round"
+            fill="none"
+            style={{ pathLength: signatureProgress }}
+          />
+          {/* Wide sweeping underline extending left */}
+          <motion.path
+            d="M150 650 Q 400 720, 600 620 Q 800 520, 1050 600"
+            stroke="#D4F51E"
+            strokeWidth="8"
+            strokeLinecap="round"
+            fill="none"
+            style={{ pathLength: signatureProgress }}
+          />
+          {/* Dramatic S curve on left side */}
+          <motion.path
+            d="M350 200 Q 200 350, 320 480 Q 440 610, 300 700"
+            stroke="#D4F51E"
+            strokeWidth="8"
+            strokeLinecap="round"
+            fill="none"
+            style={{ pathLength: signatureProgress }}
+          />
+        </motion.svg>
+      </motion.div>
+    </div>
   );
 }

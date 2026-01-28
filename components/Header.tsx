@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { useState } from "react";
 import Logo from "./ui/Logo";
 import Link from "next/link";
@@ -31,6 +31,15 @@ const menuImages = [
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDarkSection, setIsDarkSection] = useState(false);
+  
+  const { scrollY } = useScroll();
+  
+  // Change colors when scrolling past ~40% of viewport height (when hero starts shrinking)
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const threshold = window.innerHeight * 0.4;
+    setIsDarkSection(latest > threshold);
+  });
 
   const menuVariants = {
     closed: {
@@ -78,76 +87,48 @@ export default function Header() {
   return (
     <>
       {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 md:px-6 py-4">
+      <header className="fixed top-0 left-0 right-0 z-50" style={{ padding: '24px 32px' }}>
         <div className="flex items-center justify-between">
           {/* Left - Logo */}
           <Link href="/" className="relative z-10">
-            <Logo variant={isMenuOpen ? "light" : "dark"} />
+            <Logo variant={isMenuOpen || isDarkSection ? "light" : "dark"} />
           </Link>
 
-          {/* Center - LN Icon (only visible when menu is closed) */}
-          {!isMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="absolute left-1/2 -translate-x-1/2 top-4"
-            >
-              <Link href="/" className="block">
-                <svg viewBox="0 0 28 28" className="w-6 h-6 text-dark-text">
-                  <path
-                    d="M4 4 L4 20 L10 20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M14 20 L14 8 L20 20 L20 4"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </Link>
-            </motion.div>
-          )}
 
-          {/* Right - Menu Toggle Only (removed Store button) */}
-          <div className="flex items-center gap-2 md:gap-3 relative z-10">
+          {/* Right - Menu Toggle */}
+          <div className="flex items-center gap-3 relative z-10">
             {/* Menu Toggle Button */}
             <motion.button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`flex items-center justify-center w-10 h-10 rounded-lg border transition-colors ${
-                isMenuOpen
-                  ? "border-cream/30 bg-cream/10"
-                  : "border-dark-text/15 bg-transparent"
+              className={`flex items-center justify-center w-14 h-14 rounded-2xl border-2 bg-transparent transition-colors ${
+                isMenuOpen || isDarkSection
+                  ? "border-cream/30"
+                  : "border-dark-text"
               }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             >
-              <div className="flex flex-col justify-center items-center w-4 h-4 relative">
+              <div className="flex flex-col justify-center items-start w-6 h-5 relative">
                 <motion.span
-                  className={`absolute h-[1.5px] w-4 rounded-full ${
-                    isMenuOpen ? "bg-cream" : "bg-dark-text"
+                  className={`absolute top-0 h-[2px] w-6 rounded-full ${
+                    isMenuOpen || isDarkSection ? "bg-cream" : "bg-dark-text"
                   }`}
                   animate={{
                     rotate: isMenuOpen ? 45 : 0,
-                    y: isMenuOpen ? 0 : -3,
+                    y: isMenuOpen ? 10 : 0,
+                    x: isMenuOpen ? 0 : 0,
                   }}
                   transition={{ duration: 0.25 }}
                 />
                 <motion.span
-                  className={`absolute h-[1.5px] w-4 rounded-full ${
-                    isMenuOpen ? "bg-cream" : "bg-dark-text"
+                  className={`absolute bottom-0 h-[2px] w-6 rounded-full ${
+                    isMenuOpen || isDarkSection ? "bg-cream" : "bg-dark-text"
                   }`}
                   animate={{
                     rotate: isMenuOpen ? -45 : 0,
-                    y: isMenuOpen ? 0 : 3,
+                    y: isMenuOpen ? -10 : 0,
+                    x: isMenuOpen ? 0 : 0,
                   }}
                   transition={{ duration: 0.25 }}
                 />
