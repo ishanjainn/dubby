@@ -18,13 +18,13 @@ export default function Logo({ className = "", variant = "dark" }: LogoProps) {
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
       <span 
-        className={`text-[24px] md:text-[32px] tracking-[0.08em] uppercase ${textColor}`}
+        className={`text-[18px] sm:text-[22px] md:text-[32px] tracking-[0.06em] md:tracking-[0.08em] uppercase ${textColor}`}
         style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontWeight: 300 }}
       >
         Max
       </span>
       <span 
-        className={`text-[24px] md:text-[32px] tracking-[0.08em] uppercase ${textColor}`}
+        className={`text-[18px] sm:text-[22px] md:text-[32px] tracking-[0.06em] md:tracking-[0.08em] uppercase ${textColor}`}
         style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontWeight: 900 }}
       >
         Verstappen

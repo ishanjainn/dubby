@@ -87,12 +87,14 @@ export default function Header() {
   return (
     <>
       {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50" style={{ padding: '24px 32px' }}>
+      <header className="fixed top-4 left-4 right-4 sm:top-5 sm:left-5 sm:right-5 md:top-6 md:left-8 md:right-8 lg:top-8 lg:left-10 lg:right-10 z-50">
         <div className="flex items-center justify-between">
-          {/* Left - Logo */}
-          <Link href="/" className="relative z-10">
+          {/* Left - Logo (hidden on very small mobile, shown on 400px+) */}
+          <Link href="/" className="relative z-10 hidden min-[400px]:block">
             <Logo variant={isMenuOpen || isDarkSection ? "light" : "dark"} />
           </Link>
+          {/* Spacer for very small mobile to keep menu button on right */}
+          <div className="min-[400px]:hidden" />
 
 
           {/* Right - Menu Toggle */}
@@ -100,7 +102,7 @@ export default function Header() {
             {/* Menu Toggle Button */}
             <motion.button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`flex items-center justify-center w-14 h-14 rounded-2xl border-2 bg-transparent transition-colors ${
+              className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl border-2 bg-transparent transition-colors ${
                 isMenuOpen || isDarkSection
                   ? "border-cream/30"
                   : "border-dark-text"
@@ -109,25 +111,25 @@ export default function Header() {
               whileTap={{ scale: 0.98 }}
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             >
-              <div className="flex flex-col justify-center items-start w-6 h-5 relative">
+              <div className="flex flex-col justify-center items-start w-4 h-3 sm:w-5 sm:h-4 md:w-6 md:h-5 relative">
                 <motion.span
-                  className={`absolute top-0 h-[2px] w-6 rounded-full ${
+                  className={`absolute top-0 h-[2px] w-4 sm:w-5 md:w-6 rounded-full ${
                     isMenuOpen || isDarkSection ? "bg-cream" : "bg-dark-text"
                   }`}
                   animate={{
                     rotate: isMenuOpen ? 45 : 0,
-                    y: isMenuOpen ? 10 : 0,
+                    y: isMenuOpen ? 8 : 0,
                     x: isMenuOpen ? 0 : 0,
                   }}
                   transition={{ duration: 0.25 }}
                 />
                 <motion.span
-                  className={`absolute bottom-0 h-[2px] w-6 rounded-full ${
+                  className={`absolute bottom-0 h-[2px] w-4 sm:w-5 md:w-6 rounded-full ${
                     isMenuOpen || isDarkSection ? "bg-cream" : "bg-dark-text"
                   }`}
                   animate={{
                     rotate: isMenuOpen ? -45 : 0,
-                    y: isMenuOpen ? -10 : 0,
+                    y: isMenuOpen ? -8 : 0,
                     x: isMenuOpen ? 0 : 0,
                   }}
                   transition={{ duration: 0.25 }}
@@ -148,7 +150,7 @@ export default function Header() {
             exit="closed"
             className="fixed inset-0 z-40 bg-dark-green overflow-auto"
           >
-            <div className="min-h-screen px-6 pt-24 pb-12">
+            <div className="min-h-screen px-4 md:px-6 pt-20 md:pt-24 pb-8 md:pb-12">
               {/* Go to home link */}
               <motion.div
                 initial={{ opacity: 0 }}
@@ -169,7 +171,7 @@ export default function Header() {
               </motion.div>
 
               {/* Image Grid */}
-              <div className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-12 h-32 md:h-48 overflow-hidden">
+              <div className="grid grid-cols-3 md:grid-cols-5 gap-1.5 md:gap-2 mb-8 md:mb-12 h-24 md:h-48 overflow-hidden">
                 {menuImages.map((src, i) => (
                   <motion.div
                     key={i}

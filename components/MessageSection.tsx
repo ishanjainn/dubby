@@ -29,34 +29,34 @@ export default function MessageSection() {
         style={{ x: textX }}
       >
         <div className="whitespace-nowrap">
-          <span className="text-[15vw] font-display font-bold text-lime/20 tracking-tight">
+          <span className="text-[18vw] md:text-[15vw] font-display font-bold text-lime/20 tracking-tight">
             HOME WEEKEND I WAS AT HOME REMEMBER HOME WEEKEND
           </span>
         </div>
       </motion.div>
       <motion.div 
-        className="absolute inset-0 flex items-center overflow-hidden pointer-events-none mt-[15vw]"
+        className="absolute inset-0 flex items-center overflow-hidden pointer-events-none mt-[18vw] md:mt-[15vw]"
         style={{ x: textX }}
       >
         <div className="whitespace-nowrap">
-          <span className="text-[15vw] font-display font-bold text-cream/10 tracking-tight">
+          <span className="text-[18vw] md:text-[15vw] font-display font-bold text-cream/10 tracking-tight">
             WEEKEND I REMEMBER IT AT HOME MEMBER WEEKEND I
           </span>
         </div>
       </motion.div>
 
       {/* Main Content */}
-      <div className="relative z-20 flex flex-col items-center justify-center min-h-screen px-6 py-24">
+      <div className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 py-12 md:px-6 md:py-24">
         {/* Logo and Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="flex flex-col items-center mb-8"
+          className="flex flex-col items-center mb-6 md:mb-8"
         >
           {/* SD Logo */}
-          <div className="w-10 h-10 mb-3 flex items-center justify-center">
+          <div className="w-8 h-8 md:w-10 md:h-10 mb-2 md:mb-3 flex items-center justify-center">
             <svg viewBox="0 0 40 40" className="w-full h-full">
               <path
                 d="M10 8 L20 8 L20 18 L30 18 L30 32 L20 32 L20 22 L10 22 Z"
@@ -66,7 +66,7 @@ export default function MessageSection() {
               />
             </svg>
           </div>
-          <span className="text-[10px] tracking-[0.3em] uppercase text-cream/60">
+          <span className="text-[9px] md:text-[10px] tracking-[0.25em] md:tracking-[0.3em] uppercase text-cream/60">
             Message from Smrity
           </span>
         </motion.div>
@@ -77,7 +77,7 @@ export default function MessageSection() {
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.2 }}
           viewport={{ once: true }}
-          className="relative w-full max-w-md aspect-[3/4]"
+          className="relative w-full max-w-xs md:max-w-md aspect-[3/4]"
         >
           {/* Portrait Image */}
           <div className="absolute inset-0 overflow-hidden">

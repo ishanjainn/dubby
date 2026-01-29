@@ -43,8 +43,8 @@ export default function Footer() {
   return (
     <footer className="relative bg-cream overflow-hidden">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-6 py-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+      <div className="max-w-7xl mx-auto px-4 py-12 md:px-6 md:py-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           {/* Pages Column */}
           <div>
             <h3 className="text-xs tracking-[0.2em] text-dark-text/60 uppercase mb-6">
@@ -98,7 +98,7 @@ export default function Footer() {
             <h3 className="text-xs tracking-[0.2em] text-dark-text/60 uppercase mb-6">
               Sign Up
             </h3>
-            <form onSubmit={handleSubmit} className="flex gap-3">
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
               <input
                 type="email"
                 value={email}
@@ -109,7 +109,7 @@ export default function Footer() {
               />
               <button
                 type="submit"
-                className="px-6 py-3 bg-dark-green text-cream rounded-lg hover:bg-dark-text transition-colors"
+                className="px-6 py-3 bg-dark-green text-cream rounded-lg hover:bg-dark-text transition-colors whitespace-nowrap"
               >
                 Subscribe
               </button>
@@ -120,12 +120,12 @@ export default function Footer() {
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              className="mt-8 relative h-40 flex items-center justify-center"
+              className="mt-6 md:mt-8 relative h-32 md:h-40 flex items-center justify-center"
             >
               <motion.div
                 animate={{ rotateY: [0, 360] }}
                 transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                className="relative w-32 h-32"
+                className="relative w-24 h-24 md:w-32 md:h-32"
               >
                 <Image
                   src="/assets/helmet-360.png"
@@ -150,9 +150,9 @@ export default function Footer() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="mt-24 text-center"
+          className="mt-12 md:mt-24 text-center"
         >
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-display leading-tight">
+          <h2 className="text-3xl md:text-6xl lg:text-7xl font-display leading-tight">
             <span className="text-dark-text">Always</span>
             <br />
             <span className="font-bold text-dark-text">bringing</span>
@@ -185,9 +185,9 @@ export default function Footer() {
       </div>
 
       {/* Partner Logos Bar */}
-      <div className="border-t border-dark-text/10 py-8">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-wrap justify-center gap-8 items-center">
+      <div className="border-t border-dark-text/10 py-6 md:py-8">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-8 items-center">
             {partnerLogos.map((logo) => (
               <div
                 key={logo}
@@ -201,8 +201,8 @@ export default function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-dark-text/10 py-6">
-        <div className="max-w-7xl mx-auto px-6">
+      <div className="border-t border-dark-text/10 py-4 md:py-6">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Copyright */}
             <p className="text-dark-text/50 text-sm">

@@ -33,6 +33,9 @@
 
 html {
   scroll-behavior: smooth;
+  /* Prevent text size adjustment on iOS */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -40,24 +43,56 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
+  /* Improve touch scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  /* Prevent pull-to-refresh on mobile */
+  overscroll-behavior-y: contain;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+/* Mobile-friendly tap highlights */
+a, button {
+  -webkit-tap-highlight-color: rgba(212, 245, 30, 0.2);
 }
 
-::-webkit-scrollbar-track {
-  background: var(--cream);
+/* Ensure touch targets are large enough (44x44 minimum) */
+@media (max-width: 768px) {
+  button, 
+  a, 
+  input[type="submit"], 
+  input[type="button"] {
+    min-height: 44px;
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--dark-green);
-  border-radius: 4px;
+/* Custom scrollbar - hide on mobile for cleaner look */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--lime);
+@media (min-width: 769px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--cream);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--dark-green);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--lime);
+  }
 }
 
 /* Selection styles */
@@ -120,4 +155,28 @@ body {
 
 .animate-marquee-right {
   animation: marquee-right 20s linear infinite;
+}
+
+/* Slower marquee on mobile for better readability */
+@media (max-width: 768px) {
+  .animate-marquee-left {
+    animation: marquee-left 15s linear infinite;
+  }
+
+  .animate-marquee-right {
+    animation: marquee-right 15s linear infinite;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-left,
+  .animate-marquee-right,
+  .blob-animate {
+    animation: none;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
 }
