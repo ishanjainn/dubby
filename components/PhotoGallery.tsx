@@ -84,13 +84,32 @@ const timelineData: TimelineItem[] = [
 
 export default function PhotoGallery() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [scrollAmount, setScrollAmount] = useState(-2000);
 
+  // Calculate scroll amount based on ACTUAL measured content width
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    const calculateScroll = () => {
+      const viewportWidth = window.innerWidth;
+      
+      // Measure actual content width
+      const contentWidth = contentRef.current?.scrollWidth || 0;
+      
+      if (contentWidth > 0) {
+        // Scroll = content width - viewport width (so right edge meets viewport right edge)
+        const scroll = -(contentWidth - viewportWidth);
+        setScrollAmount(scroll);
+      }
+    };
+    
+    // Initial calculation after render
+    const timer = setTimeout(calculateScroll, 100);
+    
+    window.addEventListener('resize', calculateScroll);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', calculateScroll);
+    };
   }, []);
 
   const { scrollYProgress } = useScroll({
@@ -98,10 +117,6 @@ export default function PhotoGallery() {
     offset: ["start start", "end end"],
   });
 
-  // Horizontal scroll - responsive based on screen size
-  // Mobile: 180px intro + (9 × 220px items) = ~2160px content
-  // Desktop: 280px intro + (9 × 320px items) = ~3160px content
-  const scrollAmount = isMobile ? -1600 : -2200;
   const x = useTransform(scrollYProgress, [0, 1], [0, scrollAmount]);
   
   // Background: dark green → cream
@@ -111,17 +126,17 @@ export default function PhotoGallery() {
     ["#2A2F23", "#8A8A7A", "#F5F5F0"]
   );
 
-  // Text color transition
+  // Text color transition - transitions EARLIER than background for better contrast
   const textColor = useTransform(
     scrollYProgress,
-    [0, 0.5, 1],
-    ["#E8E4D9", "#4A4A3A", "#2A2F23"]
+    [0, 0.25, 0.5, 1],
+    ["#E8E4D9", "#5A5A4A", "#3A3A2A", "#2A2F23"]
   );
 
   const labelColor = useTransform(
     scrollYProgress,
-    [0, 0.5, 1],
-    ["rgba(232, 228, 217, 0.5)", "rgba(42, 47, 35, 0.4)", "rgba(42, 47, 35, 0.5)"]
+    [0, 0.25, 0.5, 1],
+    ["rgba(232, 228, 217, 0.7)", "rgba(90, 90, 74, 0.8)", "rgba(58, 58, 42, 0.8)", "rgba(42, 47, 35, 0.7)"]
   );
 
   const lineColor = useTransform(
@@ -133,7 +148,7 @@ export default function PhotoGallery() {
   return (
     <motion.section 
       ref={containerRef} 
-      className="relative h-[300vh] md:h-[400vh]"
+      className="relative h-[350vh] md:h-[350vh]"
       style={{ backgroundColor }}
     >
       {/* Sticky wrapper */}
@@ -144,21 +159,21 @@ export default function PhotoGallery() {
           style={{ x }}
         >
           {/* Wide container for horizontal scroll - auto width based on content */}
-          <div className="relative h-full flex items-center w-max">
+          <div ref={contentRef} className="relative h-full flex items-center w-max">
             
-            {/* Timeline Line */}
+            {/* Timeline Line - starts after spacer and extends full width */}
             <motion.div 
-              className="absolute top-1/2 left-[5%] h-[1px]"
-              style={{ 
-                backgroundColor: lineColor,
-                width: "95%",
-              }}
+              className="absolute top-1/2 left-4 sm:left-5 md:left-8 lg:left-10 right-0 h-[1px]"
+              style={{ backgroundColor: lineColor }}
             />
 
             {/* Timeline Items - includes intro section */}
-            <div className="flex items-center gap-0 pl-[3%] pr-[5%]">
+            <div className="flex items-center gap-0 pr-6 md:pr-10">
+              {/* Left spacer to match header logo position */}
+              <div className="flex-shrink-0 w-4 sm:w-5 md:w-8 lg:w-10" aria-hidden="true" />
+              
               {/* Intro/Title Section */}
-              <div className="flex-shrink-0 w-[180px] md:w-[280px] px-4 md:px-8 flex flex-col justify-center">
+              <div className="flex-shrink-0 w-[200px] md:w-[320px] flex flex-col justify-center">
                 <motion.div style={{ color: textColor }}>
                   <span className="text-[9px] md:text-[10px] tracking-[0.2em] uppercase opacity-50">The Journey</span>
                   <h2 className="text-2xl md:text-4xl font-display font-bold mt-2">Timeline</h2>

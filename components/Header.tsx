@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
-import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Logo from "./ui/Logo";
 import Link from "next/link";
 import Image from "next/image";
@@ -29,17 +29,99 @@ const menuImages = [
   "/assets/menu-5.jpg",
 ];
 
+// Check if a color is "light" (should use dark text/icons)
+function isLightColor(r: number, g: number, b: number): boolean {
+  // Using relative luminance formula
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5;
+}
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDarkSection, setIsDarkSection] = useState(false);
+  const [headerColor, setHeaderColor] = useState({ r: 42, g: 47, b: 35 }); // dark text initially
+  const [isDarkBg, setIsDarkBg] = useState(false);
+  const rafRef = useRef<number>();
   
-  const { scrollY } = useScroll();
+  // Detect background color at header position
+  const detectBackgroundColor = useCallback(() => {
+    // Use elementsFromPoint to find all elements at the header position
+    // Check at multiple points to be more reliable
+    const checkPoints = [
+      { x: window.innerWidth / 2, y: 60 },  // center
+      { x: 100, y: 60 },                      // left
+      { x: window.innerWidth - 100, y: 60 }, // right
+    ];
+    
+    let currentBgColor = { r: 245, g: 245, b: 240 }; // default cream (light)
+    
+    for (const point of checkPoints) {
+      const elements = document.elementsFromPoint(point.x, point.y);
+      
+      for (const element of elements) {
+        // Skip the header itself and its children
+        if (element.closest('header')) continue;
+        // Skip SVG elements (background lines)
+        if (element.tagName === 'svg' || element.tagName === 'path' || element.closest('svg')) continue;
+        // Skip elements with pointer-events-none (decorative)
+        const style = window.getComputedStyle(element);
+        if (style.pointerEvents === 'none' && element.tagName !== 'SECTION' && element.tagName !== 'DIV') continue;
+        
+        const bgColor = style.backgroundColor;
+        const match = bgColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+        
+        if (match) {
+          const r = parseInt(match[1]);
+          const g = parseInt(match[2]);
+          const b = parseInt(match[3]);
+          const a = match[4] ? parseFloat(match[4]) : 1;
+          
+          // Only use this color if it's not fully transparent
+          if (a > 0.1 && !(r === 0 && g === 0 && b === 0 && a < 1)) {
+            currentBgColor = { r, g, b };
+            break;
+          }
+        }
+      }
+      
+      // If we found a non-default color, use it
+      if (currentBgColor.r !== 245 || currentBgColor.g !== 245 || currentBgColor.b !== 240) {
+        break;
+      }
+    }
+    
+    const isLight = isLightColor(currentBgColor.r, currentBgColor.g, currentBgColor.b);
+    setIsDarkBg(!isLight);
+    
+    // Set header element colors (inverse of background)
+    if (isLight) {
+      // Light background → dark text/icons
+      setHeaderColor({ r: 42, g: 47, b: 35 });
+    } else {
+      // Dark background → light text/icons
+      setHeaderColor({ r: 232, g: 228, b: 217 });
+    }
+  }, []);
   
-  // Change colors when scrolling past ~40% of viewport height (when hero starts shrinking)
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const threshold = window.innerHeight * 0.4;
-    setIsDarkSection(latest > threshold);
-  });
+  useEffect(() => {
+    const handleScroll = () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+      rafRef.current = requestAnimationFrame(detectBackgroundColor);
+    };
+    
+    detectBackgroundColor();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', detectBackgroundColor);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', detectBackgroundColor);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, [detectBackgroundColor]);
 
   const menuVariants = {
     closed: {
@@ -92,12 +174,17 @@ export default function Header() {
           {/* Left - Logo (on small mobile: only show when scrolled, on 400px+: always show) */}
           <Link 
             href="/" 
-            className={`relative z-10 min-[400px]:block ${isDarkSection ? 'block' : 'hidden min-[400px]:block'}`}
+            className={`relative z-10 min-[400px]:block ${isDarkBg ? 'block' : 'hidden min-[400px]:block'}`}
+            style={{
+              color: isMenuOpen 
+                ? "#E8E4D9" 
+                : `rgb(${headerColor.r}, ${headerColor.g}, ${headerColor.b})`
+            }}
           >
-            <Logo variant={isMenuOpen || isDarkSection ? "light" : "dark"} />
+            <Logo variant={isMenuOpen ? "light" : (headerColor.r > 100 ? "light" : "dark")} />
           </Link>
           {/* Spacer for very small mobile when logo is hidden */}
-          <div className={`${isDarkSection ? 'hidden' : 'block'} min-[400px]:hidden`} />
+          <div className={`${isDarkBg ? 'hidden' : 'block'} min-[400px]:hidden`} />
 
 
           {/* Right - Menu Toggle */}
@@ -105,20 +192,24 @@ export default function Header() {
             {/* Menu Toggle Button */}
             <motion.button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl border-2 bg-transparent transition-colors ${
-                isMenuOpen || isDarkSection
-                  ? "border-cream/30"
-                  : "border-dark-text"
-              }`}
+              className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl border-2 bg-transparent transition-colors"
+              style={{
+                borderColor: isMenuOpen 
+                  ? "rgba(232, 228, 217, 0.3)" 
+                  : `rgba(${headerColor.r}, ${headerColor.g}, ${headerColor.b}, ${isDarkBg ? 0.3 : 1})`
+              }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             >
               <div className="flex flex-col justify-center items-start w-4 h-3 sm:w-5 sm:h-4 md:w-6 md:h-5 relative">
                 <motion.span
-                  className={`absolute top-0 h-[2px] w-4 sm:w-5 md:w-6 rounded-full ${
-                    isMenuOpen || isDarkSection ? "bg-cream" : "bg-dark-text"
-                  }`}
+                  className="absolute top-0 h-[2px] w-4 sm:w-5 md:w-6 rounded-full"
+                  style={{
+                    backgroundColor: isMenuOpen 
+                      ? "#E8E4D9" 
+                      : `rgb(${headerColor.r}, ${headerColor.g}, ${headerColor.b})`
+                  }}
                   animate={{
                     rotate: isMenuOpen ? 45 : 0,
                     y: isMenuOpen ? 8 : 0,
@@ -127,9 +218,12 @@ export default function Header() {
                   transition={{ duration: 0.25 }}
                 />
                 <motion.span
-                  className={`absolute bottom-0 h-[2px] w-4 sm:w-5 md:w-6 rounded-full ${
-                    isMenuOpen || isDarkSection ? "bg-cream" : "bg-dark-text"
-                  }`}
+                  className="absolute bottom-0 h-[2px] w-4 sm:w-5 md:w-6 rounded-full"
+                  style={{
+                    backgroundColor: isMenuOpen 
+                      ? "#E8E4D9" 
+                      : `rgb(${headerColor.r}, ${headerColor.g}, ${headerColor.b})`
+                  }}
                   animate={{
                     rotate: isMenuOpen ? -45 : 0,
                     y: isMenuOpen ? -8 : 0,
