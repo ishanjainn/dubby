@@ -89,12 +89,15 @@ export default function Header() {
       {/* Fixed Header */}
       <header className="fixed top-4 left-4 right-4 sm:top-5 sm:left-5 sm:right-5 md:top-6 md:left-8 md:right-8 lg:top-8 lg:left-10 lg:right-10 z-50">
         <div className="flex items-center justify-between">
-          {/* Left - Logo (hidden on very small mobile, shown on 400px+) */}
-          <Link href="/" className="relative z-10 hidden min-[400px]:block">
+          {/* Left - Logo (on small mobile: only show when scrolled, on 400px+: always show) */}
+          <Link 
+            href="/" 
+            className={`relative z-10 min-[400px]:block ${isDarkSection ? 'block' : 'hidden min-[400px]:block'}`}
+          >
             <Logo variant={isMenuOpen || isDarkSection ? "light" : "dark"} />
           </Link>
-          {/* Spacer for very small mobile to keep menu button on right */}
-          <div className="min-[400px]:hidden" />
+          {/* Spacer for very small mobile when logo is hidden */}
+          <div className={`${isDarkSection ? 'hidden' : 'block'} min-[400px]:hidden`} />
 
 
           {/* Right - Menu Toggle */}

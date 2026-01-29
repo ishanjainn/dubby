@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function LegacySection() {
   return (
-    <section className="relative min-h-screen w-full overflow-hidden bg-[#2A2F23] flex flex-col items-center justify-center px-6 py-24">
+    <section className="relative w-full overflow-hidden bg-[#2A2F23] flex flex-col items-center justify-start px-6 pt-6 pb-16 md:pt-12 md:pb-24">
       {/* Background color matches Hero's dark wrapper */}
       {/* No lines - uses global fixed lines from Hero */}
 
@@ -44,24 +44,12 @@ export default function LegacySection() {
         viewport={{ once: true }}
         className="relative z-20 text-center max-w-5xl"
       >
-        <h2 className="text-[6vw] md:text-[5vw] lg:text-[4.5vw] font-display font-bold italic leading-[1.1] tracking-tight">
-          <span className="text-[#C4D468]">REDEFINING</span>
-          <span className="text-cream"> LIMITS,</span>
-          <br />
-          <span className="text-cream">FIGHTING FOR </span>
-          <span className="text-[#C4D468]">WINS</span>
-          <span className="text-cream">,</span>
-          <br />
-          <span className="text-cream">BRINGING IT ALL IN</span>
-          <br />
-          <span className="text-cream">ALL WAYS. DEFINING A</span>
-          <br />
-          <span className="text-[#C4D468]">LEGACY</span>
-          <span className="text-cream"> IN FORMULA 1</span>
-          <br />
-          <span className="text-cream">ON AND OFF THE</span>
-          <br />
-          <span className="text-cream">TRACK.</span>
+        <h2 className="text-[9vw] sm:text-[7vw] md:text-[5vw] lg:text-[4vw] xl:text-[3.5vw] font-display font-bold italic leading-[1.1] tracking-tight">
+          <span className="block lg:inline"><span className="text-[#C4D468]">REDEFINING</span><span className="text-cream"> LIMITS,</span></span>
+          <span className="block lg:inline"><span className="text-cream"> FIGHTING FOR </span><span className="text-[#C4D468]">WINS</span><span className="text-cream">,</span></span>
+          <span className="block lg:inline"><span className="text-cream"> BRINGING IT ALL IN ALL WAYS.</span></span>
+          <span className="block lg:inline"><span className="text-cream"> DEFINING A </span><span className="text-[#C4D468]">LEGACY</span><span className="text-cream"> IN FORMULA 1</span></span>
+          <span className="block lg:inline"><span className="text-cream"> ON AND OFF THE TRACK.</span></span>
         </h2>
       </motion.div>
     </section>

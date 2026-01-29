@@ -46,7 +46,7 @@ export default function MessageSection() {
       </motion.div>
 
       {/* Main Content */}
-      <div className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 py-12 md:px-6 md:py-24">
+      <div className="relative z-20 flex flex-col items-center justify-start sm:justify-center min-h-0 sm:min-h-screen px-4 mt-0 pt-4 pb-12 sm:py-12 md:px-6 md:py-24">
         {/* Logo and Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
