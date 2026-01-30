@@ -40,16 +40,25 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [headerColor, setHeaderColor] = useState({ r: 42, g: 47, b: 35 }); // dark text initially
   const [isDarkBg, setIsDarkBg] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true); // Track if at top of page (hero visible)
   const rafRef = useRef<number>();
   
   // Detect background color at header position
   const detectBackgroundColor = useCallback(() => {
+    // Check if at top of page (hero section visible)
+    const scrollY = window.scrollY || window.pageYOffset;
+    setIsAtTop(scrollY < 100); // Consider "at top" if scrolled less than 100px
+    
     // Use elementsFromPoint to find all elements at the header position
     // Check at multiple points to be more reliable
+    // Use responsive y position based on header location
+    const isMobile = window.innerWidth < 768;
+    const yPos = isMobile ? 30 : 60; // Lower y on mobile since header is at top-4 (16px)
+    
     const checkPoints = [
-      { x: window.innerWidth / 2, y: 60 },  // center
-      { x: 100, y: 60 },                      // left
-      { x: window.innerWidth - 100, y: 60 }, // right
+      { x: window.innerWidth / 2, y: yPos },  // center
+      { x: Math.min(60, window.innerWidth * 0.15), y: yPos },  // left (responsive)
+      { x: Math.max(window.innerWidth - 60, window.innerWidth * 0.85), y: yPos }, // right (responsive)
     ];
     
     let currentBgColor = { r: 245, g: 245, b: 240 }; // default cream (light)
@@ -110,13 +119,17 @@ export default function Header() {
       rafRef.current = requestAnimationFrame(detectBackgroundColor);
     };
     
+    // Run detection immediately and also after a short delay to ensure DOM is ready
     detectBackgroundColor();
+    const initialTimeout = setTimeout(detectBackgroundColor, 100);
+    
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', detectBackgroundColor);
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', detectBackgroundColor);
+      clearTimeout(initialTimeout);
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current);
       }
@@ -171,20 +184,15 @@ export default function Header() {
       {/* Fixed Header */}
       <header className="fixed top-4 left-4 right-4 sm:top-5 sm:left-5 sm:right-5 md:top-6 md:left-8 md:right-8 lg:top-8 lg:left-10 lg:right-10 z-50">
         <div className="flex items-center justify-between">
-          {/* Left - Logo (on small mobile: only show when scrolled, on 400px+: always show) */}
+          {/* Left - Logo (hidden on mobile when at hero section) */}
           <Link 
             href="/" 
-            className={`relative z-10 min-[400px]:block ${isDarkBg ? 'block' : 'hidden min-[400px]:block'}`}
-            style={{
-              color: isMenuOpen 
-                ? "#E8E4D9" 
-                : `rgb(${headerColor.r}, ${headerColor.g}, ${headerColor.b})`
-            }}
+            className={`relative z-10 ${isAtTop ? 'hidden md:block' : 'block'}`}
           >
-            <Logo variant={isMenuOpen ? "light" : (headerColor.r > 100 ? "light" : "dark")} />
+            <Logo variant={isMenuOpen ? "light" : (isDarkBg ? "light" : "dark")} />
           </Link>
-          {/* Spacer for very small mobile when logo is hidden */}
-          <div className={`${isDarkBg ? 'hidden' : 'block'} min-[400px]:hidden`} />
+          {/* Spacer when logo is hidden on mobile */}
+          {isAtTop && <div className="md:hidden" />}
 
 
           {/* Right - Menu Toggle */}

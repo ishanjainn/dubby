@@ -148,7 +148,7 @@ export default function PhotoGallery() {
   return (
     <motion.section 
       ref={containerRef} 
-      className="relative h-[350vh] md:h-[350vh]"
+      className="relative h-[220vh] md:h-[320vh]"
       style={{ backgroundColor }}
     >
       {/* Sticky wrapper */}

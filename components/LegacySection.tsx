@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function LegacySection() {
   return (
-    <section className="relative w-full overflow-hidden bg-[#2A2F23] flex flex-col items-center justify-start px-6 pt-6 pb-16 md:pt-12 md:pb-24">
+    <section className="relative w-full overflow-hidden bg-[#2A2F23] flex flex-col items-center justify-start px-6 pt-6 pb-4 md:pt-12 md:pb-24">
       {/* Background color matches Hero's dark wrapper */}
       {/* No lines - uses global fixed lines from Hero */}
 
