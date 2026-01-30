@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Logo from "./ui/Logo";
 import Link from "next/link";
 import Image from "next/image";
+import { useHeaderContext } from "./HeaderContext";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -42,6 +43,13 @@ export default function Header() {
   const [isDarkBg, setIsDarkBg] = useState(false);
   const [isAtTop, setIsAtTop] = useState(true); // Track if at top of page (hero visible)
   const rafRef = useRef<number>();
+  const { forceLightHeader } = useHeaderContext();
+  
+  // Override colors when forceLightHeader is true
+  const effectiveIsDarkBg = forceLightHeader || isDarkBg;
+  const effectiveHeaderColor = forceLightHeader 
+    ? { r: 232, g: 228, b: 217 } // light color for dark backgrounds
+    : headerColor;
   
   // Detect background color at header position
   const detectBackgroundColor = useCallback(() => {
@@ -189,7 +197,7 @@ export default function Header() {
             href="/" 
             className={`relative z-10 ${isAtTop ? 'hidden md:block' : 'block'}`}
           >
-            <Logo variant={isMenuOpen ? "light" : (isDarkBg ? "light" : "dark")} />
+            <Logo variant={isMenuOpen ? "light" : (effectiveIsDarkBg ? "light" : "dark")} />
           </Link>
           {/* Spacer when logo is hidden on mobile */}
           {isAtTop && <div className="md:hidden" />}
@@ -204,7 +212,9 @@ export default function Header() {
               style={{
                 borderColor: isMenuOpen 
                   ? "rgba(232, 228, 217, 0.3)" 
-                  : `rgba(${headerColor.r}, ${headerColor.g}, ${headerColor.b}, ${isDarkBg ? 0.3 : 1})`
+                  : effectiveIsDarkBg 
+                    ? "rgba(232, 228, 217, 0.3)"
+                    : "rgb(42, 47, 35)" // Solid black on light backgrounds
               }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -216,7 +226,9 @@ export default function Header() {
                   style={{
                     backgroundColor: isMenuOpen 
                       ? "#E8E4D9" 
-                      : `rgb(${headerColor.r}, ${headerColor.g}, ${headerColor.b})`
+                      : effectiveIsDarkBg 
+                        ? "#E8E4D9"
+                        : "#2A2F23" // Solid black on light backgrounds
                   }}
                   animate={{
                     rotate: isMenuOpen ? 45 : 0,
@@ -230,7 +242,9 @@ export default function Header() {
                   style={{
                     backgroundColor: isMenuOpen 
                       ? "#E8E4D9" 
-                      : `rgb(${headerColor.r}, ${headerColor.g}, ${headerColor.b})`
+                      : effectiveIsDarkBg 
+                        ? "#E8E4D9"
+                        : "#2A2F23" // Solid black on light backgrounds
                   }}
                   animate={{
                     rotate: isMenuOpen ? -45 : 0,

@@ -2,137 +2,263 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 
-const socialImages = [
-  { src: "/assets/social/social-1.jpg", span: "col-span-1 row-span-1" },
-  { src: "/assets/social/social-2.jpg", span: "col-span-1 row-span-2" },
-  { src: "/assets/social/social-3.jpg", span: "col-span-1 row-span-1" },
-  { src: "/assets/social/social-4.jpg", span: "col-span-1 row-span-1" },
-  { src: "/assets/social/social-5.jpg", span: "col-span-1 row-span-1" },
-  { src: "/assets/social/social-6.jpg", span: "col-span-1 row-span-2" },
-  { src: "/assets/social/social-7.jpg", span: "col-span-1 row-span-1" },
+// Different images for career vs favorites sections
+const careerImages = [
+  "/assets/social/career-1.jpg",
+  "/assets/social/career-2.jpg",
+  "/assets/social/career-3.jpg",
+  "/assets/social/career-4.jpg",
+  "/assets/social/career-5.jpg",
+  "/assets/social/career-6.jpg",
+  "/assets/social/career-7.jpg",
 ];
+
+const favoritesImages = [
+  "/assets/social/favorites-1.jpg",
+  "/assets/social/favorites-2.jpg",
+  "/assets/social/favorites-3.jpg",
+  "/assets/social/favorites-4.jpg",
+  "/assets/social/favorites-5.jpg",
+  "/assets/social/favorites-6.jpg",
+  "/assets/social/favorites-7.jpg",
+];
+
+// Card rotations for the fan effect (index 3 is center)
+const cardRotations = [-20, -13, -6, 0, 6, 13, 20];
+// Outer cards much lower, center card at top - creates arc shape
+const cardOffsetY = [100, 60, 25, 0, 25, 60, 100];
+// Z-index: center card highest, outer cards behind
+const cardZIndex = [1, 2, 3, 7, 3, 2, 1];
 
 const socialLinks = [
-  { name: "TikTok", href: "https://www.tiktok.com/@landonorris", icon: "tiktok" },
-  { name: "Instagram", href: "https://www.instagram.com/lando", icon: "instagram" },
-  { name: "YouTube", href: "https://www.youtube.com/@LandoNorris", icon: "youtube" },
-  { name: "Twitch", href: "https://www.twitch.tv/landonorris", icon: "twitch" },
+  { name: "TikTok", href: "https://www.tiktok.com/@landonorris" },
+  { name: "Instagram", href: "https://www.instagram.com/lando" },
+  { name: "YouTube", href: "https://www.youtube.com/@LandoNorris" },
+  { name: "Twitch", href: "https://www.twitch.tv/landonorris" },
 ];
 
-function SocialIcon({ icon }: { icon: string }) {
-  switch (icon) {
-    case "tiktok":
-      return (
-        <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-          <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
-        </svg>
-      );
-    case "instagram":
-      return (
-        <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-        </svg>
-      );
-    case "youtube":
-      return (
-        <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-        </svg>
-      );
-    case "twitch":
-      return (
-        <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-          <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" />
-        </svg>
-      );
-    default:
-      return null;
-  }
+interface SocialGridProps {
+  variant?: 'career' | 'favorites';
 }
 
-export default function SocialGrid() {
+function SocialCard({ 
+  src, 
+  index,
+  rotation,
+  offsetY,
+  zIndex,
+  isHovered,
+  onHover,
+  onLeave,
+  isMobile,
+  totalCards,
+  calculatedCardWidth
+}: { 
+  src: string; 
+  index: number;
+  rotation: number;
+  offsetY: number;
+  zIndex: number;
+  isHovered: boolean;
+  onHover: () => void;
+  onLeave: () => void;
+  isMobile: boolean;
+  totalCards: number;
+  calculatedCardWidth: number;
+}) {
+  // Smaller values for mobile
+  const mobileRotation = rotation * 0.7;
+  const mobileOffsetY = offsetY * 0.5;
+  const actualRotation = isMobile ? mobileRotation : rotation;
+  const actualOffsetY = isMobile ? mobileOffsetY : offsetY;
+  
+  // Use the calculated card width that matches the CSS clamp() value
+  // Overlap is higher on mobile to keep cards from extending beyond viewport
+  const overlap = isMobile ? calculatedCardWidth * 0.45 : calculatedCardWidth * 0.3;
+  
+  // Calculate position from center (index 3 is center for 7 cards)
+  const centerIndex = Math.floor(totalCards / 2);
+  const offsetFromCenter = index - centerIndex;
+  
+  // X position: each card is offset by (cardWidth - overlap) from center
+  const xPosition = offsetFromCenter * (calculatedCardWidth - overlap);
+
   return (
-    <section className="relative py-24 bg-dark-green overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
+    <motion.div
+      className="absolute cursor-pointer"
+      style={{
+        width: isMobile ? 'clamp(60px, 12vw, 90px)' : 'clamp(120px, 15vw, 180px)',
+        height: isMobile ? 'clamp(85px, 17vw, 130px)' : 'clamp(170px, 22vw, 260px)',
+        // Use left: 50% of container, transform handles the offset
+        left: '50%',
+        bottom: 0,
+        zIndex: isHovered ? 10 : zIndex,
+        transformOrigin: 'bottom center',
+        // Use margin-left to offset by half the card width, then xPosition for fan spread
+        marginLeft: -calculatedCardWidth / 2 + xPosition,
+      }}
+      initial={{ 
+        rotate: actualRotation, 
+        y: actualOffsetY,
+      }}
+      animate={{ 
+        rotate: isHovered ? 0 : actualRotation,
+        y: isHovered ? actualOffsetY - 20 : actualOffsetY,
+        scale: isHovered ? 1.08 : 1,
+      }}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+      onMouseEnter={onHover}
+      onMouseLeave={onLeave}
+      onTouchStart={onHover}
+      onTouchEnd={onLeave}
+    >
+      <div className="relative w-full h-full rounded-2xl md:rounded-3xl overflow-hidden shadow-xl">
+        <Image
+          src={src}
+          alt={`Social media content ${index + 1}`}
+          fill
+          className="object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = "none";
+          }}
+        />
+        {/* Fallback gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-lime/40 to-dark-green/60" />
+      </div>
+    </motion.div>
+  );
+}
+
+export default function SocialGrid({ variant = 'career' }: SocialGridProps) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [cardWidth, setCardWidth] = useState(160);
+  const images = variant === 'career' ? careerImages : favoritesImages;
+
+  // Detect mobile and calculate responsive card width to match CSS clamp()
+  useEffect(() => {
+    const updateDimensions = () => {
+      const vw = window.innerWidth;
+      const mobile = vw < 768;
+      setIsMobile(mobile);
+      
+      if (mobile) {
+        // Matches: clamp(60px, 12vw, 90px)
+        const vwValue = vw * 0.12;
+        setCardWidth(Math.min(90, Math.max(60, vwValue)));
+      } else {
+        // Matches: clamp(120px, 15vw, 180px)
+        const vwValue = vw * 0.15;
+        setCardWidth(Math.min(180, Math.max(120, vwValue)));
+      }
+    };
+    
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+  
+  // Icon based on variant
+  const Icon = variant === 'career' ? (
+    // Racing flag icon for career
+    <svg viewBox="0 0 24 24" className="w-8 h-8 md:w-10 md:h-10 stroke-dark-text/50" fill="none" strokeWidth="1.5">
+      <path d="M4 21V4m0 0c3 0 6-2 9 0s6 0 9 0v10c-3 0-6 2-9 0s-6 0-9 0" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ) : (
+    // Heart icon for favorites
+    <svg viewBox="0 0 24 24" className="w-8 h-8 md:w-10 md:h-10 stroke-dark-text/50" fill="none" strokeWidth="1.5">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+
+  return (
+    <section className="relative pt-16 md:pt-24 pb-32 md:pb-44 lg:pb-56 bg-cream w-full">
+      <div className="w-full px-6 flex flex-col items-center overflow-x-clip">
+        {/* Icon */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="flex justify-center mb-4 md:mb-6"
+        >
+          {Icon}
+        </motion.div>
+
         {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="mb-12 text-center"
+          className="mb-12 md:mb-16 text-center"
         >
-          <h2 className="text-4xl md:text-6xl font-display text-cream leading-tight">
-            What&apos;s up
-            <br />
-            <span className="font-bold text-lime">On Socials</span>
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-display leading-tight tracking-tight">
+            <span className="font-bold text-dark-text block">WHAT&apos;S UP</span>
+            <span className="font-light text-dark-text/50">ON SOCIALS</span>
           </h2>
         </motion.div>
 
-        {/* Image Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[200px]">
-          {socialImages.map((image, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`relative overflow-hidden rounded-xl group cursor-pointer ${image.span}`}
-            >
-              <Image
-                src={image.src}
-                alt={`Social media content ${index + 1}`}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                }}
-              />
-              {/* Fallback gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-lime/20 to-dark-text/40" />
-
-              {/* Hover overlay */}
-              <div className="absolute inset-0 bg-dark-green/0 group-hover:bg-dark-green/30 transition-colors duration-500 flex items-center justify-center">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileHover={{ opacity: 1, scale: 1 }}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="w-8 h-8 fill-cream"
-                  >
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-                  </svg>
-                </motion.div>
-              </div>
-            </motion.div>
+        {/* Fanned Card Deck Container - using absolute positioning for true centering */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="relative w-full max-w-5xl"
+          style={{ 
+            // Height = card height + max Y offset + buffer for transforms
+            // Desktop: 260px card + 100px offset + 40px buffer = 400px
+            // Mobile: 130px card + 50px offset + 20px buffer = 200px
+            height: isMobile ? '200px' : '400px',
+          }}
+        >
+          {images.map((src, index) => (
+            <SocialCard 
+              key={index} 
+              src={src} 
+              index={index}
+              rotation={cardRotations[index]}
+              offsetY={cardOffsetY[index]}
+              zIndex={cardZIndex[index]}
+              isHovered={hoveredIndex === index}
+              onHover={() => setHoveredIndex(index)}
+              onLeave={() => setHoveredIndex(null)}
+              isMobile={isMobile}
+              totalCards={images.length}
+              calculatedCardWidth={cardWidth}
+            />
           ))}
-        </div>
+        </motion.div>
 
-        {/* Social Links */}
+        {/* Follow Text & Links - Completely separate section with generous spacing */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-12 text-center"
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="text-center"
+          style={{
+            // Extra margin to clear the card transforms (max Y offset is 100px on desktop, 50px on mobile)
+            marginTop: isMobile ? '80px' : '140px',
+          }}
         >
-          <p className="text-cream/60 mb-6">Follow Lando on social media</p>
-          <div className="flex justify-center gap-4">
+          <p className="text-dark-text/60 text-base md:text-lg mb-4 md:mb-6">
+            Follow Lando on social media
+          </p>
+          <div className="flex flex-wrap justify-center gap-4 md:gap-8">
             {socialLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-3 bg-cream/10 text-cream rounded-full hover:bg-lime hover:text-dark-green transition-colors"
+                className="text-dark-text/50 hover:text-dark-green text-xs md:text-sm font-medium uppercase tracking-widest transition-colors"
               >
-                <SocialIcon icon={link.icon} />
-                <span className="text-sm font-medium lowercase">{link.name}</span>
+                {link.name}
               </a>
             ))}
           </div>

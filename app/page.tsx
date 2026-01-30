@@ -7,12 +7,11 @@ import BackgroundLines from "@/components/BackgroundLines";
 import LegacySection from "@/components/LegacySection";
 import PhotoGallery from "@/components/PhotoGallery";
 import OnOffTrack from "@/components/OnOffTrack";
-import HelmetsSection from "@/components/HelmetsSection";
+import CareerSection from "@/components/CareerSection";
 import FavoritesSection from "@/components/FavoritesSection";
-import StoreSection from "@/components/StoreSection";
-import PartnersSection from "@/components/PartnersSection";
 import SocialGrid from "@/components/SocialGrid";
 import Footer from "@/components/Footer";
+import { useHeaderContext } from "@/components/HeaderContext";
 
 type RevealType = 'ontrack' | 'offtrack' | null;
 
@@ -20,9 +19,11 @@ export default function Home() {
   const [isRevealed, setIsRevealed] = useState(false);
   const [revealType, setRevealType] = useState<RevealType>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const socialGridRef = useRef<HTMLDivElement>(null);
   const panelY = useMotionValue(1000); // Start off-screen, will be set properly on reveal
   const accumulatedDeltaRef = useRef(0);
   const isClosingRef = useRef(false);
+  const { setForceLightHeader } = useHeaderContext();
   
   // Transform for visual feedback while dragging
   const panelOpacity = useTransform(panelY, [0, 150], [1, 0.8]);
@@ -32,6 +33,7 @@ export default function Home() {
     isClosingRef.current = false;
     setRevealType(type);
     setIsRevealed(true);
+    // Let automatic header color detection handle the color based on visible section
     document.body.style.overflow = 'hidden';
     
     // Animate panel up from bottom
@@ -56,6 +58,7 @@ export default function Home() {
         setRevealType(null);
         accumulatedDeltaRef.current = 0;
         isClosingRef.current = false;
+        setForceLightHeader(false); // Reset header color when panel closes
         document.body.style.overflow = '';
       }
     });
@@ -67,6 +70,43 @@ export default function Home() {
       document.body.style.overflow = '';
     };
   }, []);
+
+  // Track scroll position inside overlay to update header color
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    const socialGrid = socialGridRef.current;
+    
+    if (!container || !isRevealed) return;
+
+    const handleOverlayScroll = () => {
+      if (!socialGrid) {
+        // Still in dark section, force light header
+        setForceLightHeader(true);
+        return;
+      }
+
+      const socialGridRect = socialGrid.getBoundingClientRect();
+      // If top of SocialGrid is above the middle of the viewport, switch to dark header
+      const threshold = window.innerHeight * 0.3; // 30% from top
+      
+      if (socialGridRect.top <= threshold) {
+        // SocialGrid (light bg) is visible - use dark header
+        setForceLightHeader(false);
+      } else {
+        // Still in GridSection (dark bg) - use light header
+        setForceLightHeader(true);
+      }
+    };
+
+    // Initial check
+    setForceLightHeader(true); // Start with light header for dark GridSection
+    
+    container.addEventListener('scroll', handleOverlayScroll, { passive: true });
+    
+    return () => {
+      container.removeEventListener('scroll', handleOverlayScroll);
+    };
+  }, [isRevealed, setForceLightHeader]);
 
   // Handle wheel/touch events for drag-to-close
   useEffect(() => {
@@ -202,14 +242,24 @@ export default function Home() {
           </div>
           {revealType === 'ontrack' ? (
             <>
-              <HelmetsSection />
-              <StoreSection />
-              <PartnersSection />
-              <SocialGrid />
+              <CareerSection />
+              <div ref={socialGridRef}>
+                <SocialGrid variant="career" />
+              </div>
+              {/* Spacer between social section and footer */}
+              <div className="h-32 sm:h-40 md:h-48 lg:h-56 bg-cream" />
               <Footer />
             </>
           ) : (
-            <FavoritesSection />
+            <>
+              <FavoritesSection />
+              <div ref={socialGridRef}>
+                <SocialGrid variant="favorites" />
+              </div>
+              {/* Spacer between social section and footer */}
+              <div className="h-32 sm:h-40 md:h-48 lg:h-56 bg-cream" />
+              <Footer />
+            </>
           )}
         </motion.div>
       )}
