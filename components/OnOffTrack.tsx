@@ -1,18 +1,17 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import PasswordModal from "./PasswordModal";
 
 interface OnOffTrackProps {
-  onReveal?: () => void;
+  onReveal?: (type: 'ontrack' | 'offtrack') => void;
 }
 
 export default function OnOffTrack({ onReveal }: OnOffTrackProps) {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
-  const [showPersonalContent, setShowPersonalContent] = useState(false);
 
   // Check sessionStorage on mount for existing unlock
   useEffect(() => {
@@ -22,16 +21,17 @@ export default function OnOffTrack({ onReveal }: OnOffTrackProps) {
 
   const handleOnTrackClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    // Trigger reveal of content below
-    onReveal?.();
+    // Trigger reveal of On Track content (Helmets section)
+    onReveal?.('ontrack');
   };
 
   const handleOffTrackClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (isUnlocked) {
-      setShowPersonalContent(true);
-      onReveal?.();
+      // Already unlocked, reveal Off Track content directly
+      onReveal?.('offtrack');
     } else {
+      // Show password modal
       setShowPasswordModal(true);
     }
   };
@@ -39,8 +39,8 @@ export default function OnOffTrack({ onReveal }: OnOffTrackProps) {
   const handlePasswordSuccess = () => {
     setIsUnlocked(true);
     setShowPasswordModal(false);
-    setShowPersonalContent(true);
-    onReveal?.();
+    // Reveal Off Track content (Favorites section)
+    onReveal?.('offtrack');
   };
 
   return (
@@ -304,60 +304,6 @@ export default function OnOffTrack({ onReveal }: OnOffTrackProps) {
           </div>
         </div>
 
-        {/* Personal Content Section - Revealed after password */}
-        <AnimatePresence>
-          {showPersonalContent && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-              className="absolute inset-0 z-20 overflow-auto bg-cream"
-            >
-              <div className="max-w-7xl mx-auto px-4 md:px-12 py-12 md:py-24">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                >
-                  <div className="flex items-center justify-between mb-6 md:mb-8">
-                    <div>
-                      <h3 className="font-display text-2xl md:text-4xl font-bold text-dark-text mb-1 md:mb-2">
-                        Personal Life
-                      </h3>
-                      <p className="text-dark-text/60 text-sm md:text-base">
-                        A glimpse into life off the track
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setShowPersonalContent(false)}
-                      className="text-dark-text/60 hover:text-dark-text transition-colors p-2"
-                      aria-label="Close personal content"
-                    >
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M18 6L6 18M6 6l12 12"/>
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
-                    {[1, 2, 3, 4, 5, 6].map((item) => (
-                      <motion.div
-                        key={item}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 + item * 0.1, duration: 0.4 }}
-                        className="aspect-square bg-gradient-to-br from-lime/10 to-dark-text/5 
-                                 rounded-xl md:rounded-2xl flex items-center justify-center border border-dark-text/10"
-                      >
-                        <span className="text-dark-text/30 text-xs md:text-sm">Content {item}</span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </section>
 
       <PasswordModal

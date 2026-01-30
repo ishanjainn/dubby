@@ -8,13 +8,17 @@ import LegacySection from "@/components/LegacySection";
 import PhotoGallery from "@/components/PhotoGallery";
 import OnOffTrack from "@/components/OnOffTrack";
 import HelmetsSection from "@/components/HelmetsSection";
+import FavoritesSection from "@/components/FavoritesSection";
 import StoreSection from "@/components/StoreSection";
 import PartnersSection from "@/components/PartnersSection";
 import SocialGrid from "@/components/SocialGrid";
 import Footer from "@/components/Footer";
 
+type RevealType = 'ontrack' | 'offtrack' | null;
+
 export default function Home() {
   const [isRevealed, setIsRevealed] = useState(false);
+  const [revealType, setRevealType] = useState<RevealType>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const panelY = useMotionValue(1000); // Start off-screen, will be set properly on reveal
   const accumulatedDeltaRef = useRef(0);
@@ -23,9 +27,10 @@ export default function Home() {
   // Transform for visual feedback while dragging
   const panelOpacity = useTransform(panelY, [0, 150], [1, 0.8]);
 
-  const handleReveal = () => {
+  const handleReveal = (type: 'ontrack' | 'offtrack') => {
     accumulatedDeltaRef.current = 0;
     isClosingRef.current = false;
+    setRevealType(type);
     setIsRevealed(true);
     document.body.style.overflow = 'hidden';
     
@@ -48,6 +53,7 @@ export default function Home() {
       ease: [0.4, 0, 1, 1],
       onComplete: () => {
         setIsRevealed(false);
+        setRevealType(null);
         accumulatedDeltaRef.current = 0;
         isClosingRef.current = false;
         document.body.style.overflow = '';
@@ -184,17 +190,27 @@ export default function Home() {
             y: panelY,
             opacity: panelOpacity 
           }}
-          className="fixed inset-0 z-20 bg-cream overflow-y-auto"
+          className={`fixed inset-0 z-20 overflow-y-auto ${
+            revealType === 'offtrack' ? 'bg-[#1a1a1a]' : 'bg-cream'
+          }`}
         >
           {/* Drag indicator at top */}
           <div className="sticky top-0 left-0 right-0 z-10 flex flex-col items-center pt-3 pb-1 pointer-events-none">
-            <div className="w-10 h-1 bg-dark-text/30 rounded-full" />
+            <div className={`w-10 h-1 rounded-full ${
+              revealType === 'offtrack' ? 'bg-white/30' : 'bg-dark-text/30'
+            }`} />
           </div>
-          <HelmetsSection />
-          <StoreSection />
-          <PartnersSection />
-          <SocialGrid />
-          <Footer />
+          {revealType === 'ontrack' ? (
+            <>
+              <HelmetsSection />
+              <StoreSection />
+              <PartnersSection />
+              <SocialGrid />
+              <Footer />
+            </>
+          ) : (
+            <FavoritesSection />
+          )}
         </motion.div>
       )}
     </main>
