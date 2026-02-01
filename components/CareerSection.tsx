@@ -11,22 +11,22 @@ const categoryColors: Record<string, string> = {
 };
 
 const careerItems: GridItem[] = [
-  { name: "First Win", category: "win" },
-  { name: "Miami GP", category: "win" },
-  { name: "Dutch GP", category: "win" },
-  { name: "Singapore GP", category: "win" },
-  { name: "Monza Podium", category: "podium" },
-  { name: "Silverstone P2", category: "podium" },
-  { name: "Brazil Pole", category: "pole" },
-  { name: "100th Race", category: "milestone" },
-  { name: "Monaco Podium", category: "podium" },
-  { name: "Imola P3", category: "podium" },
-  { name: "F1 Debut", category: "milestone" },
-  { name: "F2 Runner-Up", category: "championship" },
-  { name: "Euro F3 Champ", category: "championship" },
-  { name: "MSA Formula", category: "championship" },
-  { name: "Ginetta Junior", category: "championship" },
-  { name: "Karting World", category: "championship" },
+  { name: "First Win", category: "win", image: "/assets/career/ch-1.jpg" },
+  { name: "Miami GP", category: "win", image: "/assets/career/ch-2.jpg" },
+  { name: "Dutch GP", category: "win", image: "/assets/career/ch-3.jpg" },
+  { name: "Singapore GP", category: "win", image: "/assets/career/ch-4.jpg" },
+  { name: "Monza Podium", category: "podium", image: "/assets/career/ch-5.jpg" },
+  { name: "Silverstone P2", category: "podium", image: "/assets/career/ch-6.jpg" },
+  { name: "Brazil Pole", category: "pole", image: "/assets/career/ch-7.jpg" },
+  { name: "100th Race", category: "milestone", image: "/assets/career/ch-8.jpg" },
+  { name: "Monaco Podium", category: "podium", image: "/assets/career/ch-9.jpg" },
+  { name: "Imola P3", category: "podium", image: "/assets/career/ch-10.jpg" },
+  { name: "F1 Debut", category: "milestone", image: "/assets/career/ch-11.jpg" },
+  { name: "F2 Runner-Up", category: "championship", image: "/assets/career/ch-12.jpg" },
+  { name: "Euro F3 Champ", category: "championship", image: "/assets/career/ch-13.jpg" },
+  { name: "MSA Formula", category: "championship", image: "/assets/career/ch-14.jpg" },
+  { name: "Ginetta Junior", category: "championship", image: "/assets/career/ch-15.jpg" },
+  { name: "Karting World", category: "championship", image: "/assets/career/ch-16.jpg" },
 ];
 
 export default function CareerSection() {

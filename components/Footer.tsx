@@ -11,12 +11,14 @@ const pageLinks = [
   { name: "CALENDAR", href: "/calendar" },
 ];
 
-const socialLinks = [
-  { name: "TIKTOK", href: "https://www.tiktok.com/@landonorris" },
-  { name: "INSTAGRAM", href: "https://www.instagram.com/lando" },
-  { name: "YOUTUBE", href: "https://www.youtube.com/@LandoNorris" },
-  { name: "TWITCH", href: "https://www.twitch.tv/landonorris" },
-];
+// LinkedIn icon component
+const LinkedInIcon = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className}>
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+  </svg>
+);
+
+const linkedInUrl = "https://www.linkedin.com/in/smrity-dubey-a68110142/";
 
 export default function Footer() {
   return (
@@ -30,7 +32,7 @@ export default function Footer() {
       />
 
       {/* Footer Box Container - with generous side padding */}
-      <div className="relative px-4 sm:px-6 md:px-10 lg:px-16">
+      <div className="relative px-4 sm:px-6 md:px-10 lg:px-16 overflow-visible">
         
         {/* The Dark Box with SVG shape */}
         <svg 
@@ -144,24 +146,20 @@ export default function Footer() {
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="text-center z-10"
+                className="text-center z-10 flex flex-col items-center gap-3"
               >
-                <h3 className="text-[7px] tracking-[0.15em] text-cream/40 uppercase mb-1">
+                <h3 className="text-[7px] tracking-[0.15em] text-cream/40 uppercase">
                   Follow On
                 </h3>
-                <div className="space-y-0">
-                  {socialLinks.map((link) => (
-                    <a
-                      key={link.name}
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-cream text-xs font-display font-semibold hover:text-lime transition-colors block leading-tight !min-h-0"
-                    >
-                      {link.name}
-                    </a>
-                  ))}
-                </div>
+                <a
+                  href={linkedInUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Follow on LinkedIn"
+                  className="inline-block transition-transform hover:scale-110"
+                >
+                  <LinkedInIcon className="w-6 h-6 fill-[#0A66C2] hover:opacity-80 transition-opacity" />
+                </a>
               </motion.div>
             </div>
 
@@ -173,8 +171,7 @@ export default function Footer() {
                 viewport={{ once: true }}
                 className="mb-0.5"
               >
-                <span className="font-script text-lime text-xl">Lando</span>
-                <span className="font-script text-lime text-sm align-super ml-0.5">4</span>
+                <span className="font-script text-lime text-xl">SmrityDubey</span>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -194,28 +191,7 @@ export default function Footer() {
               </motion.div>
             </div>
 
-            {/* Helmet */}
-            <div className="flex justify-center">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1 }}
-                className="relative w-[120px] h-[80px]"
-              >
-                <Image
-                  src="/assets/helmet-footer.png"
-                  alt="Lando Norris Helmet"
-                  fill
-                  className="object-contain object-bottom"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = "none";
-                  }}
-                />
-              </motion.div>
             </div>
-          </div>
 
           {/* Desktop Layout - relative positioning */}
           <div className="hidden sm:block relative h-full">
@@ -247,50 +223,46 @@ export default function Footer() {
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="absolute right-0 top-[50%] -translate-y-1/2 text-center z-10"
+              className="absolute right-0 top-[50%] -translate-y-1/2 text-center z-10 flex flex-col items-center gap-4 md:gap-5"
             >
-              <h3 className="text-[8px] md:text-[9px] tracking-[0.15em] text-cream/40 uppercase mb-2">
+              <h3 className="text-[8px] md:text-[9px] tracking-[0.15em] text-cream/40 uppercase">
                 Follow On
               </h3>
-              <div className="space-y-2">
-                {socialLinks.map((link) => (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-cream text-[11px] md:text-xs lg:text-sm font-display font-semibold hover:text-lime transition-colors block leading-normal"
-                  >
-                    {link.name}
-                  </a>
-                ))}
-              </div>
+              <a
+                href={linkedInUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow on LinkedIn"
+                className="inline-block transition-transform hover:scale-110"
+              >
+                <LinkedInIcon className="w-7 h-7 md:w-8 md:h-8 lg:w-9 lg:h-9 fill-[#0A66C2] hover:opacity-80 transition-opacity" />
+              </a>
             </motion.div>
 
-            {/* Helmet - at bottom center */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex justify-center">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1 }}
-                className="relative w-[160px] h-[110px] md:w-[200px] md:h-[140px] lg:w-[260px] lg:h-[180px]"
-              >
-                <Image
-                  src="/assets/helmet-footer.png"
-                  alt="Lando Norris Helmet"
-                  fill
-                  className="object-contain object-bottom"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = "none";
-                  }}
-                />
-              </motion.div>
             </div>
-          </div>
 
         </div>
+
+        {/* Face Image - positioned at bottom of box for all screen sizes */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1 }}
+          className="absolute left-1/2 -translate-x-1/2 w-[180px] h-[160px] sm:w-[250px] sm:h-[220px] md:w-[320px] md:h-[280px] lg:w-[400px] lg:h-[350px] z-10"
+          style={{ bottom: '4%' }}
+        >
+          <Image
+            src="/assets/face-footer.png"
+            alt="Lando Norris"
+            fill
+            className="object-contain object-bottom"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = "none";
+            }}
+          />
+        </motion.div>
 
         {/* Desktop Tagline - positioned relative to the box container */}
         <div className="hidden sm:flex absolute top-[8%] left-1/2 -translate-x-1/2 flex-col items-center z-20">
@@ -300,8 +272,7 @@ export default function Footer() {
             viewport={{ once: true }}
             className="mb-1"
           >
-            <span className="font-script text-lime text-2xl md:text-3xl lg:text-4xl">Lando</span>
-            <span className="font-script text-lime text-lg md:text-xl align-super ml-0.5">4</span>
+            <span className="font-script text-lime text-2xl md:text-3xl lg:text-4xl">SmrityDubey</span>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 30 }}

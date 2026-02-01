@@ -12,22 +12,22 @@ const categoryColors: Record<string, string> = {
 };
 
 const favorites: GridItem[] = [
-  { name: "Breaking Bad", category: "shows" },
-  { name: "The Office", category: "shows" },
-  { name: "Friends", category: "shows" },
-  { name: "Taylor Swift", category: "music" },
-  { name: "Ed Sheeran", category: "music" },
-  { name: "Coldplay", category: "music" },
-  { name: "Sushi", category: "food" },
-  { name: "Pizza", category: "food" },
-  { name: "Ice Cream", category: "food" },
-  { name: "Paris", category: "travel" },
-  { name: "Bali", category: "travel" },
-  { name: "Tokyo", category: "travel" },
-  { name: "Photography", category: "hobbies" },
-  { name: "Yoga", category: "hobbies" },
-  { name: "Atomic Habits", category: "books" },
-  { name: "The Alchemist", category: "books" },
+  { name: "One Piece", category: "shows", image: "/assets/favorites/fh-1.jpg" },
+  { name: "Dal Pitti", category: "shows", image: "/assets/favorites/fh-2.jpg" },
+  { name: "Maxxxyyyy", category: "shows", image: "/assets/favorites/fh-3.jpg" },
+  { name: "The Lumineers", category: "music", image: "/assets/favorites/fh-4.jpg" },
+  { name: "Disneyland Paris", category: "travel", image: "/assets/favorites/fh-5.jpg" },
+  { name: "Momos", category: "food", image: "/assets/favorites/fh-6.jpg" },
+  { name: "Demon Slayer", category: "shows", image: "/assets/favorites/fh-7.jpg" },
+  { name: "Anywhere in Japan", category: "travel", image: "/assets/favorites/fh-8.jpg" },
+  { name: "Dooron Dooron", category: "shows", image: "/assets/favorites/fh-9.jpg" },
+  { name: "Ramen", category: "food", image: "/assets/favorites/fh-10.jpg" },
+  { name: "Gol Gappe in Sec-56", category: "food", image: "/assets/favorites/fh-11.jpg" },
+  { name: "Radwimps - Nandemonaiya", category: "music", image: "/assets/favorites/fh-12.jpg" },
+  { name: "Lemme Sleep", category: "hobbies", image: "/assets/favorites/fh-13.jpg" },
+  { name: "Chhath Pooja", category: "hobbies", image: "/assets/favorites/fh-14.jpg" },
+  { name: "Lilies or any cute flowers :)", category: "hobbies", image: "/assets/favorites/fh-15.jpg" },
+  { name: "The Alchemist", category: "books", image: "/assets/favorites/fh-16.jpg" },
 ];
 
 export default function FavoritesSection() {
